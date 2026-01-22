@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WFConFin.Data;
 
@@ -11,9 +12,11 @@ using WFConFin.Data;
 namespace WFConFin.Migrations
 {
     [DbContext(typeof(WFConfinDbContext))]
-    partial class WFConfinDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260121182402_jsonignore")]
+    partial class jsonignore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace WFConFin.Models
 {
@@ -12,13 +13,16 @@ namespace WFConFin.Models
         
         [Required(ErrorMessage = "O campo Estado é obrigatório")]
         [StringLength(2, MinimumLength = 2, ErrorMessage = "O campo deve ter 2 caracteres")]
-        public string EstadosSigla { get; set; } // Nome da entidade + Campo
+        public string EstadoSigla { get; set; } // Nome da entidade + Campo
 
         public Cidade ()
         {
             Id = Guid.NewGuid(); // Gera um novo GUID ao criar uma instância de Cidade
         }
 
-        public Estado Estado { get; set; } // Relacionamento com a entidade Estado
+        [JsonIgnore] //Faz com que o campo não seja serializado em JSON/ ignorado no jason
+        public Estado? Estado { get; set; } // Relacionamento com a entidade Estado
     }
+
+
 }

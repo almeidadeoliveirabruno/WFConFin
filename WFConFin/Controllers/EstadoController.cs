@@ -130,6 +130,7 @@ namespace WFConFin.Controllers
         {
             try
             {
+
                 //Método Entity
                 var lista = _context.Estado
                     .Where(e => e.Sigla.ToUpper().Contains(valor.ToUpper()) || e.Nome.ToUpper().Contains(valor.ToUpper()))
@@ -157,6 +158,46 @@ namespace WFConFin.Controllers
                 return BadRequest("Erro, consulta de estado. Exceção: " + e.Message); //mensagem caso de algum erro
             }
         }
+
+
+        [HttpGet("Paginacao")]
+        public IActionResult GetEstadoPaginacao([FromQuery] string valor, int skip, int take, bool ordemDesc)
+        {
+            //skip ignora info de registro de um sql
+            //take numero de informações que quer trazer
+            try
+            {
+
+                var lista = from o in _context.Estado
+                            where o.Sigla.ToUpper().Contains(valor.ToUpper()) || o.Nome.ToUpper().Contains(valor.ToUpper())
+                            select o; //traz todos os nomes
+
+                if (ordemDesc)
+                {
+                    lista = from o in lista
+                            orderby o.Nome descending
+                            select o;
+                }
+                else
+                {
+                    lista = from o in lista
+                            orderby o.Nome ascending
+                            select o;
+                }
+
+                var qtde = lista.Count(); //quantidade total de registros da consulta
+                var dados = lista.Skip(skip).Take(take).ToList(); //pular e trazer a quantidade
+                var paginacaoResponse = new PaginacaoResponse<Estado>(dados, qtde, skip, take);
+                return Ok(paginacaoResponse);
+
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest("Erro, consulta de estado. Exceção: " + e.Message); //mensagem caso de algum erro
+            }
+        }
+
 
     }
 }
