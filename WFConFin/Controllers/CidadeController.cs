@@ -18,12 +18,12 @@ namespace WFConFin.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetCidades()
+        public async Task<IActionResult> GetCidades()
         {
             try
             {
                 // var result = _context.Cidade.Include(x=>x.Estado).ToList(); // Faz o join com a tabela Estado, mostrando os dados do estado junto com a cidade
-                var result = _context.Cidade.ToList();
+                var result = await _context.Cidade.ToListAsync();
                 return Ok(result);
             }
 
@@ -34,12 +34,12 @@ namespace WFConFin.Controllers
         }
 
         [HttpPost]
-        public IActionResult PostCidade([FromBody] Cidade cidade)
+        public async Task<IActionResult> PostCidade([FromBody] Cidade cidade)
         {
             try
             {
-                _context.Cidade.Add(cidade);
-                int valor = _context.SaveChanges(); // 0 se não conseguir salvar e 1 se salvou
+                await _context.Cidade.AddAsync(cidade);
+                int valor = await _context.SaveChangesAsync(); // 0 se não conseguir salvar e 1 se salvou
 
                 if (valor == 1)
                 {
@@ -58,12 +58,12 @@ namespace WFConFin.Controllers
         }
 
         [HttpPut]
-        public IActionResult PutCidade([FromBody] Cidade cidade)
+        public async Task<IActionResult> PutCidade([FromBody] Cidade cidade)
         {
             try
             {
                 _context.Cidade.Update(cidade);
-                int valor = _context.SaveChanges(); // 0 se não conseguir salvar e 1 se salvou
+                int valor = await _context.SaveChangesAsync(); // 0 se não conseguir salvar e 1 se salvou
 
                 if (valor == 1)
                 {
@@ -83,15 +83,15 @@ namespace WFConFin.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteCidade([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteCidade([FromRoute] Guid id)
         {
             try
             {
-                Cidade cidade = _context.Cidade.Find(id);
+                Cidade cidade = await _context.Cidade.FindAsync(id);
                 if (cidade != null)
                 {
                     _context.Cidade.Remove(cidade);
-                    var valor = _context.SaveChanges();
+                    var valor = await _context.SaveChangesAsync();
                     if (valor == 1)
                     {
                         return Ok("Cidade removida com sucesso");
@@ -114,11 +114,11 @@ namespace WFConFin.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetCidade([FromRoute] Guid id)
+        public async Task<IActionResult> GetCidadePesquisa([FromRoute] Guid id)
         {
             try
             {
-                Cidade cidade = _context.Cidade.Find(id);
+                Cidade cidade = await _context.Cidade.FindAsync(id);
                     if (cidade != null)
                     {
                         return Ok(cidade);
@@ -136,15 +136,15 @@ namespace WFConFin.Controllers
         }
 
         [HttpGet("Pesquisa")]
-        public IActionResult GetCidadePesquisa([FromQuery] string valor)
+        public async Task<IActionResult> GetCidadePesquisa([FromQuery] string valor)
         {
             try
             {
 
                 //Método Entity
-                var lista = _context.Cidade
+                var lista = await _context.Cidade
                     .Where(e => e.Nome.ToUpper().Contains(valor.ToUpper()) || e.EstadoSigla.ToUpper().Contains(valor.ToUpper()))
-                    .ToList();
+                    .ToListAsync();
                 return Ok(lista);
 
                 //Equivalente em SQL:
@@ -157,7 +157,7 @@ namespace WFConFin.Controllers
         }
 
         [HttpGet("Paginacao")]
-        public IActionResult GetCidadePaginacao([FromQuery] string valor, int skip, int take, bool ordemDesc)
+        public async Task<IActionResult> GetCidadePaginacao([FromQuery] string valor, int skip, int take, bool ordemDesc)
         {
             //skip ignora info de registro de um sql
             //take numero de informações que quer trazer
@@ -182,7 +182,7 @@ namespace WFConFin.Controllers
                 }
 
                 var qtde = lista.Count(); //quantidade total de registros da consulta
-                var dados = lista.Skip(skip).Take(take).ToList(); //pular e trazer a quantidade
+                var dados = await lista.Skip(skip).Take(take).ToListAsync(); //pular e trazer a quantidade
                 var paginacaoResponse = new PaginacaoResponse<Cidade>(dados, qtde, skip, take);
                 return Ok(paginacaoResponse);
 

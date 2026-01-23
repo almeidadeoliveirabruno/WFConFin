@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using WFConFin.Data;
 using WFConFin.Models;
@@ -17,11 +18,13 @@ namespace WFConFin.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetEstados()
+        public async Task<IActionResult> GetEstados()
         {
             try
             {
-                var result = _context.Estado.ToList();
+                // Com o Task, o servidor libera o recurso para atender outras pessoas enquanto o banco de dados trabalha. Isso aumenta drasticamente a escalabilidade da  aplicação.
+
+                var result = await _context.Estado.ToListAsync();
                 return Ok(result);
             }
             catch (Exception e)
@@ -31,12 +34,12 @@ namespace WFConFin.Controllers
         }
 
         [HttpPost]
-        public IActionResult PostEstados([FromBody]Estado estado)
+        public async Task<IActionResult> PostEstados([FromBody]Estado estado)
         {
             try
             {
-                _context.Estado.Add(estado);
-                var valor = _context.SaveChanges(); // retorna 0 ou 1, se deu certo vai ser igual a 1
+                await _context.Estado.AddAsync(estado);
+                var valor = await _context.SaveChangesAsync(); // retorna 0 ou 1, se deu certo vai ser igual a 1
                 if (valor == 1)
                 {
                     return Ok("Sucesso, estado incluído "); //mensagem caso de algum erro
@@ -53,12 +56,12 @@ namespace WFConFin.Controllers
         }
 
         [HttpPut]
-        public IActionResult PutEstados([FromBody] Estado estado)
+        public async Task<IActionResult> PutEstados([FromBody] Estado estado)
         {
             try
             {
                 _context.Estado.Update(estado);
-                var valor = _context.SaveChanges(); // retorna 0 ou 1, se deu certo vai ser igual a 1
+                var valor = await _context.SaveChangesAsync(); // retorna 0 ou 1, se deu certo vai ser igual a 1
                 if (valor == 1)
                 {
                     return Ok("Sucesso, estado incluído "); //mensagem caso de algum erro
@@ -75,15 +78,15 @@ namespace WFConFin.Controllers
         }
 
         [HttpDelete("{sigla}")]
-        public IActionResult DeleteEstados([FromRoute] string sigla)
+        public async Task<IActionResult> DeleteEstados([FromRoute] string sigla)
         {
             try
             {
-                var estado = _context.Estado.Find(sigla); // localizar o estado pela sigla
+                var estado = await _context.Estado.FindAsync(sigla); // localizar o estado pela sigla
                 if (estado.Sigla == sigla && !string.IsNullOrEmpty(estado.Sigla))
                 {
                     _context.Estado.Remove(estado);
-                    var valor = _context.SaveChanges(); // retorna 0 ou 1, se deu certo vai ser igual a 1
+                    var valor = await _context.SaveChangesAsync(); // retorna 0 ou 1, se deu certo vai ser igual a 1
                     if (valor == 1)
                     {
                         return Ok("Sucesso, estado excluído "); //mensagem caso de algum erro
@@ -105,11 +108,11 @@ namespace WFConFin.Controllers
         }
 
         [HttpGet("{sigla}")]
-        public IActionResult GetEstado([FromRoute] string sigla)
+        public async Task<IActionResult> GetEstado([FromRoute] string sigla)
         {
             try
             {
-                var estado = _context.Estado.Find(sigla); // localizar o estado pela sigla
+                var estado = await _context.Estado.FindAsync(sigla); // localizar o estado pela sigla
                 if (estado.Sigla == sigla && !string.IsNullOrEmpty(estado.Sigla))
                 {
                     return Ok(estado); //retorna o estado encontrado
@@ -126,15 +129,15 @@ namespace WFConFin.Controllers
         }
 
         [HttpGet("Pesquisa")]
-        public IActionResult GetEstadoPesquisa([FromQuery] string valor)
+        public async Task<IActionResult> GetEstadoPesquisa([FromQuery] string valor)
         {
             try
             {
 
                 //Método Entity
-                var lista = _context.Estado
+                var lista = await _context.Estado
                     .Where(e => e.Sigla.ToUpper().Contains(valor.ToUpper()) || e.Nome.ToUpper().Contains(valor.ToUpper()))
-                    .ToList();
+                    .ToListAsync();
                 return Ok(lista);
 
                 //Query Syntax
@@ -161,7 +164,7 @@ namespace WFConFin.Controllers
 
 
         [HttpGet("Paginacao")]
-        public IActionResult GetEstadoPaginacao([FromQuery] string valor, int skip, int take, bool ordemDesc)
+        public async Task<IActionResult> GetEstadoPaginacao([FromQuery] string valor, int skip, int take, bool ordemDesc)
         {
             //skip ignora info de registro de um sql
             //take numero de informações que quer trazer
@@ -186,7 +189,7 @@ namespace WFConFin.Controllers
                 }
 
                 var qtde = lista.Count(); //quantidade total de registros da consulta
-                var dados = lista.Skip(skip).Take(take).ToList(); //pular e trazer a quantidade
+                var dados = await lista.Skip(skip).Take(take).ToListAsync(); //pular e trazer a quantidade
                 var paginacaoResponse = new PaginacaoResponse<Estado>(dados, qtde, skip, take);
                 return Ok(paginacaoResponse);
 

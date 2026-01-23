@@ -33,7 +33,7 @@ namespace WFConFin.Models
         }
 
         public Guid? CidadeId { get; set; } //chave estrangeira para a entidade Cidade. Campo pode ser nulo
-        public Cidade Cidade { get; set; } //relacionamento com a entidade Cidade
+        public Cidade? Cidade { get; set; } //relacionamento com a entidade Cidade
 
     }
 }
