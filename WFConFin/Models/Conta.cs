@@ -33,6 +33,6 @@ namespace WFConFin.Models
 
         [Required]
         public Guid PessoaId { get; set; } // chave estrangeira para a entidade Pessoa.
-        public Pessoa Pessoa { get; set; } // relacionamento com a entidade Pessoa
+        public Pessoa? Pessoa { get; set; } // relacionamento com a entidade Pessoa
     }
 }
